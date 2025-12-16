@@ -1,0 +1,38 @@
+.swiper-button-next,
+.swiper-button-prev {
+    background-color: white;
+    border-radius:100%;
+    color:black;
+    width: 2rem;
+    height: 2rem;
+    font-weight: 1000;
+    opacity: 0%;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+    transform: scale(1.15);
+    opacity: 95%;
+}
+/* .swiper-button-next,
+.swiper-button-prev::before {
+    display: none;
+} */
+
+.swiper-button-next:active,
+.swiper-button-prev:active {
+    transform: scale(1.05);
+
+}
+.swiper-button-disabled{
+    display:none;   
+}
+
+.index-link:hover .swiper-button-prev{
+    opacity: 85;
+}
+
+
+.index-link:hover .swiper-button-next{
+    opacity: 85;
+}

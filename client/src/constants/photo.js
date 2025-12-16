@@ -1,0 +1,1 @@
+export const COVER_PHOTO_INDEX = 0;
