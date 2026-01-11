@@ -25,19 +25,19 @@ import "swiper/css/navigation";
 // import './styles.css';
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { event, EVENTS } from "./event";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import theme from "./theme";
 import { ThemeProvider } from "@mui/material/styles";
 
-import { CheckoutProvider } from '@stripe/react-stripe-js/checkout';
-import { loadStripe } from '@stripe/stripe-js';
+// import { CheckoutProvider } from '@stripe/react-stripe-js/checkout';
+// import { loadStripe } from '@stripe/stripe-js';
 
-const stripe_pk = `pk_test_51So5iLFN0LBgeq2lvYl5z8dkSkw7NOKM18mQMENjdWqoKSqiwwqQMUzJfUH1PAkLrvPkywFZ6Wd3nVJf37EH1osC00frDbyBcV`;
+// const stripe_pk = `pk_test_51So5iLFN0LBgeq2lvYl5z8dkSkw7NOKM18mQMENjdWqoKSqiwwqQMUzJfUH1PAkLrvPkywFZ6Wd3nVJf37EH1osC00frDbyBcV`;
 
-const stripePromise = loadStripe(stripe_pk);
+// const stripePromise = loadStripe(stripe_pk);
 const queryClient = new QueryClient();
 
 function App() {
