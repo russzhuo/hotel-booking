@@ -21,6 +21,13 @@ import java.util.UUID;
         })
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Booking {
+    public enum PaymentStatus {
+        PENDING,
+        PAID,
+        FAILED,
+        CANCELLED,
+        REFUNDED,
+    }
 
     @Id
     @GeneratedValue
@@ -51,4 +58,11 @@ public class Booking {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "stripe_payment_status", nullable = true)
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus stripePaymentStatus;
+
+    @Column(name = "stripe_checkout_session_id", unique = true, nullable = true)
+    private String stripeCheckoutSessionId;
 }

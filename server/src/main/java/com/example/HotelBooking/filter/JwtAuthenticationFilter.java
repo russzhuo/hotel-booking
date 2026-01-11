@@ -38,7 +38,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     private final List<String> permitAllPatterns = List.of(
-            "/api/auth/**"
+            "/api/auth/**",
+            "/api/webhook/stripe"
     );
 
     private boolean isPermitAll(String uri) {
@@ -52,6 +53,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String authorizationHeader = request.getHeader(HEADER_STRING);
         String requestURI = request.getRequestURI();
+
+        log.info("Request URI: {} {}", requestURI, isPermitAll(requestURI));
 
         if (isPermitAll(requestURI)) {
             filterChain.doFilter(request, response);

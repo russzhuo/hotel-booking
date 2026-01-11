@@ -4,6 +4,11 @@ import java.util.function.Consumer;
 
 public final class UpdateUtils {
 
+    private void rand() {
+        int myList[] = {4,3,7};
+
+    }
+
     private UpdateUtils() {
         // prevent instantiation
     }

@@ -1,6 +1,7 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { api } from "../services/http-client";
 import { useQuery } from "@tanstack/react-query";
+import { event, EVENTS } from "../event";
 
 const fetchUserPlaces = async () => {
   const response = await api.get("/places/user-places");
@@ -60,6 +61,20 @@ export const usePlaceDetails = (placeId) => {
     queryKey: [`place-details${placeId ? "-" + placeId : ""}`],
     queryFn: () => (placeId ? fetchPlaceDetails(placeId) : null),
   });
+
+  useEffect(() => {
+    const handler = () => {
+      queryResults?.refetch();
+    };
+
+    const evtType = EVENTS.REFRESH_PLACE_DETAIL;
+
+    event.on(evtType, handler);
+
+    return () => {
+      event.off(evtType, handler);
+    };
+  }, [queryResults]);
 
   const update = useCallback(async (data = {}) => {
     return updatePlace({id: placeId, ...data});

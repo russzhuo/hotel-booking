@@ -46,11 +46,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("http://localhost:5173")); // 支持 https
+        config.setAllowedOriginPatterns(List.of("http://localhost:5173", "http://localhost:8080")); // 支持 https
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization"));
-        config.setAllowCredentials(true);        // 关键：允许携带 cookie / Authorization
+        config.setAllowCredentials(true);
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -96,8 +96,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/places").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/resources/**").permitAll()
                         .requestMatchers("/api/places/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/resources/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/webhook/**").permitAll()
                         .anyRequest().authenticated()
                 );
 

@@ -11,7 +11,11 @@ import { Perks } from "../components/Perks";
 
 export default function PlacePage() {
   const { id } = useParams();
-  const { data: place, error, isLoading } = usePlaceDetails(id);
+  const { data: placeDetail, error, isLoading } = usePlaceDetails(id);
+  const { basicInfo: place, blockedDates } = placeDetail ?? {};
+  
+  console.log("placeDetail: ", placeDetail);
+  console.log('blockedDates: ', blockedDates);
 
   const renderContent = useCallback(() => {
     return (
@@ -35,7 +39,7 @@ export default function PlacePage() {
 
         {/* Gallery */}
         <PlaceGallery place={place} />
-
+        
         {/* Main Content Grid */}
         <Grid container spacing={{ xs: 6, md: 10 }} sx={{ mt: 6 }}>
           {/* Left Column: Description, Info, Perks */}
@@ -116,7 +120,7 @@ export default function PlacePage() {
                 mb: { xs: 4 },
               }}
             >
-              <BookingWidget place={place} />
+              <BookingWidget place={place} blockedDates={blockedDates} />
             </Box>
           </Grid>
         </Grid>

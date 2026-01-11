@@ -17,7 +17,10 @@ import {
   Apps as AppsIcon,
   ArrowBackIosNew as ArrowBackIosNewIcon,
 } from "@mui/icons-material";
-import { MAX_CONTENT_WIDTH, MAX_CONTENT_WIDTH_PX } from "../constants/layout";
+import { MAX_CONTENT_WIDTH } from "../constants/layout";
+// import "swiper/css";
+// import "swiper/css/navigation";
+// import "swiper/css/pagination";
 
 export default function PlaceGallery({ place }) {
   const [visible, setVisible] = useState(false);
@@ -78,7 +81,7 @@ export default function PlaceGallery({ place }) {
       <Stack
         direction={isMobile ? "column" : "row"}
         spacing={2}
-        sx={{ height: { md: 480, xs: 780 } }}
+        sx={{ height: isMobile ? "" : 480 }}
       >
         <Box
           sx={{
@@ -89,9 +92,8 @@ export default function PlaceGallery({ place }) {
         >
           <Image
             onClick={() => setVisible(true)}
-            className={`${
-              isMobile ? "" : "rounded-tl-2xl rounded-bl-2xl "
-            }cursor-pointer w-full h-full hover:brightness-[86%] overflow-hidden object-cover `}
+            className={`${isMobile ? "" : "rounded-tl-2xl rounded-bl-2xl "
+              }cursor-pointer w-full h-full hover:brightness-[86%] overflow-hidden object-cover `}
             src={placeCover}
             alt="Place Cover"
           />
@@ -125,40 +127,44 @@ export default function PlaceGallery({ place }) {
             </Typography>
           </Button>
         </Box>
-
         <Box
           sx={{
             width: { md: 1 / 2, xs: 1 },
             height: 1,
           }}
         >
-          <Grid
-            container
-            spacing={2}
-            sx={{
-              height: 1,
-            }}
-          >
-            {place.photoUrls.slice(1, 5).map((url, idx) => {
-              return (
-                <Grid key={`${url}-${idx}`} size={6}>
-                  <Image
-                    onClick={() => setVisible(true)}
-                    className={`cursor-pointer w-full h-full hover:brightness-[86%] overflow-hidden object-cover${
-                      !isMobile && idx === 1 ? " rounded-tr-2xl" : ""
-                    } ${!isMobile && idx === 3 ? " rounded-br-2xl" : ""} ${
-                      !isMobile &&
-                      idx === 1 &&
-                      place.photoUrls.length === 3 &&
-                      `rounded-r-2xl`
-                    }`}
-                    src={url}
-                    alt={url}
-                  />
-                </Grid>
-              );
-            })}
-          </Grid>
+
+          {
+            !isMobile && (
+              <Grid
+                container
+                spacing={2}
+                sx={{
+                  height: 1,
+                }}
+              >
+                {place.photoUrls.slice(1, 5).map((url, idx) => {
+                  return (
+                    <Grid key={`${url}-${idx}`} size={6}>
+                      <Image
+                        onClick={() => setVisible(true)}
+                        className={`cursor-pointer w-full h-full hover:brightness-[86%] overflow-hidden object-cover${!isMobile && idx === 1 ? " rounded-tr-2xl" : ""
+                          } ${!isMobile && idx === 3 ? " rounded-br-2xl" : ""} ${!isMobile &&
+                          idx === 1 &&
+                          place.photoUrls.length === 3 &&
+                          `rounded-r-2xl`
+                          }`}
+                        src={url}
+                        alt={url}
+                      />
+                    </Grid>
+                  );
+                })}
+              </Grid>
+
+            )
+          }
+
         </Box>
       </Stack>
 

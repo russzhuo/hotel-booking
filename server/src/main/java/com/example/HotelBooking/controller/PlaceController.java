@@ -14,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,11 +69,14 @@ public class PlaceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<PlaceResponse>> getPlaceById(@PathVariable UUID id, @AuthenticationPrincipal User user) {
+    public ResponseEntity<ApiResponse<PlaceDetailResponse>> getPlaceById(@PathVariable UUID id, @AuthenticationPrincipal User user) {
         log.info("Fetching place with ID: {}", id);
 
         PlaceResponse placeResponse = placeService.getPlaceById(id);
+        List<LocalDate> blockedDates = placeService.getPlaceBlockedDates(id);
 
-        return ResponseEntity.ok(ApiResponse.success(placeResponse, "Place retrieved successfully"));
+        PlaceDetailResponse placeDetailResponse = new PlaceDetailResponse(placeResponse, blockedDates);
+
+        return ResponseEntity.ok(ApiResponse.success(placeDetailResponse, "Place retrieved successfully"));
     }
 }

@@ -11,6 +11,9 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
+import { refreshPlaceDetail } from "../event";
+import CheckoutForm from "./CheukoutForm";
+import { useNavigate } from "react-router-dom";
 
 function calcDateDiffInDays(checkIn, checkOut) {
   const a = new Date(checkIn);
@@ -34,8 +37,9 @@ const FeeRow = ({ label, amount }) => (
 
 21273939;
 
-export default function BookingWidget({ place }) {
+export default function BookingWidget({ place, blockedDates = [] }) {
   const { user } = useContext(UserContext);
+  const navigate = useNavigate();
 
   const today = useMemo(() => dayjs().startOf("day"), []);
   const tomorrow = useMemo(() => today.add(1, "day"), [today]);
@@ -47,6 +51,8 @@ export default function BookingWidget({ place }) {
 
   const [checkIn, setCheckIn] = useState(today);
   const [checkOut, setCheckOut] = useState(tomorrow);
+
+  const [creatingBooking, setCreatingBooking] = useState(false);
 
   let cleaningFee = 0;
   let ServiceFee = 0;
@@ -102,34 +108,52 @@ export default function BookingWidget({ place }) {
   const handleBookingSubmit = async (ev) => {
     ev.preventDefault();
 
+    if (creatingBooking) {
+      return false;
+    }
+
     console.log(user);
 
     if (checkInError || checkOutError) {
       return;
     }
 
+    const tmpl = "YYYY-MM-DDTHH:mm:ss";
+
     const bookingData = {
       placeId: place.id,
       user: user.id,
-      checkIn,
-      checkOut,
+      checkIn: checkIn.format(tmpl),
+      checkOut: checkOut.format(tmpl),
       numberOfGuests: guests,
       price: total,
+      cancelUrl: location.href,
     };
 
+    setCreatingBooking(true);
+
     createBooking(bookingData)
-      .then(() => {
-        toast.success("Your booking has been placed!");
+      .then((resp) => {
+        const url = resp.data?.data?.stripeCheckoutUrl;
+
+        if (url) {
+          //redirect to payment page
+          window.location.href = url;
+        }
       })
       .catch((err) => {
         console.log(err);
         toast.error("Failed to process this booking");
+      })
+      .finally(() => {
+        setCreatingBooking(false);
       });
   };
 
   const handleCheckInChange = (newValue) => {
     setCheckIn(newValue);
   };
+
 
   const handleCheckOutChange = (newValue) => {
     setCheckOut(newValue);
@@ -143,6 +167,10 @@ export default function BookingWidget({ place }) {
 
     setGuests(value);
   };
+
+  const shouldDisableDate = (day) => blockedDates.some((blockedDate) => day.isSame(blockedDate, 'day'));
+
+  console.log('creatingBooking: ', creatingBooking);
 
   return (
     <Paper
@@ -168,6 +196,7 @@ export default function BookingWidget({ place }) {
           label="check-in"
           value={checkIn}
           disablePast
+          shouldDisableDate={shouldDisableDate}
           minDate={today}
           slotProps={{
             textField: {
@@ -182,6 +211,7 @@ export default function BookingWidget({ place }) {
           label="check-out"
           value={checkOut}
           disablePast
+          shouldDisableDate={shouldDisableDate}
           minDate={tomorrow}
           slotProps={{
             textField: {
@@ -237,9 +267,18 @@ export default function BookingWidget({ place }) {
           type="submit"
           variant="contained"
           disabled={checkInError || checkOutError}
+          loading={creatingBooking}
         >
-          Book this place
+          {
+            creatingBooking ?
+              <>
+                <CircularProgress size={20} sx={{ mr: 1 }} />
+                Processing Booking...
+              </>
+              : `Book this place`
+          }
         </Button>
+        {/* <CheckoutForm /> */}
       </Box>
     </Paper>
   );

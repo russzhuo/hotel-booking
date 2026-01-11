@@ -4,6 +4,7 @@ import com.example.HotelBooking.dto.*;
 import com.example.HotelBooking.entity.Booking;
 import com.example.HotelBooking.entity.User;
 import com.example.HotelBooking.service.BookingService;
+import com.stripe.exception.StripeException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,15 +27,15 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<BookingResponse>> createBooking(@RequestBody CreateBookingRequest createBookingRequest, @AuthenticationPrincipal User user) {
+    public ResponseEntity<ApiResponse<CreateBookingResponse>> createBooking(@RequestBody CreateBookingRequest createBookingRequest, @AuthenticationPrincipal User user) throws StripeException {
         log.info("User '{}' (ID: {}) is attempting to create a booking for place ID: {}",
                 user.getName(),
                 user.getId(),
                 createBookingRequest.placeId());
 
-        BookingResponse bookingResponse = bookingService.createBooking(createBookingRequest, user);
+        CreateBookingResponse createBookingResponse = bookingService.createBooking(createBookingRequest, user);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(bookingResponse, "Booking created successfully"));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(createBookingResponse, "Booking created successfully"));
     }
 
     @GetMapping("/user-bookings")

@@ -1,9 +1,6 @@
 package com.example.HotelBooking.service.impl;
 
-import com.example.HotelBooking.dto.BookingResponse;
-import com.example.HotelBooking.dto.CreateBookingRequest;
-import com.example.HotelBooking.dto.PlaceResponse;
-import com.example.HotelBooking.dto.UpdateBookingRequest;
+import com.example.HotelBooking.dto.*;
 import com.example.HotelBooking.entity.Booking;
 import com.example.HotelBooking.entity.Place;
 import com.example.HotelBooking.entity.User;
@@ -12,9 +9,14 @@ import com.example.HotelBooking.infrastructure.cache.BookingRedisCache;
 import com.example.HotelBooking.repository.BookingRepository;
 import com.example.HotelBooking.repository.PlaceRepository;
 import com.example.HotelBooking.service.BookingService;
+import com.example.HotelBooking.service.PaymentService;
 import com.example.HotelBooking.utils.UpdateUtils;
+import com.stripe.exception.StripeException;
+import com.stripe.model.checkout.Session;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.server.servlet.ServletWebServerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,12 +29,13 @@ import java.util.UUID;
 @Transactional
 @Slf4j
 public class BookingServiceImpl implements BookingService {
-
     private final BookingRepository bookingRepository;
 
     private final PlaceRepository placeRepository;
 
     private final BookingRedisCache bookingCache;
+
+    private final PaymentService paymentService;
 
     @Override
     public List<BookingResponse> getOwnedBookings(User user) {
@@ -62,7 +65,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingResponse createBooking(CreateBookingRequest createBookingRequest, User user) {
+    public CreateBookingResponse createBooking(CreateBookingRequest createBookingRequest, User user) throws StripeException {
         Place place = placeRepository.findById(createBookingRequest.placeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Place not found with id: " + createBookingRequest.placeId()));
 
@@ -73,10 +76,23 @@ public class BookingServiceImpl implements BookingService {
                 .place(place)
                 .guests(createBookingRequest.numberOfGuests())
                 .user(user)
+                .stripePaymentStatus(Booking.PaymentStatus.PENDING)
                 .build();
 
         // Persist booking
         bookingRepository.save(booking);
+
+        Session checkoutSession = paymentService.createCheckoutSession(
+                new CreateCheckSessionRequest(
+                        "hkd",
+                        createBookingRequest.price(),
+                        "http://localhost:5173/account/bookings/" + booking.getId(),
+                        createBookingRequest.cancelUrl(),
+                        place.getTitle()
+                )
+        );
+
+        booking.setStripeCheckoutSessionId(checkoutSession.getId());
 
         BookingResponse resp = BookingResponse.from(booking);
 
@@ -84,7 +100,7 @@ public class BookingServiceImpl implements BookingService {
         bookingCache.evictUserBookings(user.getId());
         bookingCache.evictAllBookings();
 
-        return resp;
+        return CreateBookingResponse.from(booking, checkoutSession);
     }
 
 
@@ -145,5 +161,6 @@ public class BookingServiceImpl implements BookingService {
         bookingCache.evictUserBookings(user.getId());
         bookingCache.evictAllBookings();
     }
+
 
 }

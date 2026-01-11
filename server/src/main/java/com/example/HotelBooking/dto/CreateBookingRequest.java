@@ -3,6 +3,7 @@ package com.example.HotelBooking.dto;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -26,5 +27,8 @@ public record CreateBookingRequest(
 
         @NotNull(message = "Total price is required")
         @Positive(message = "Price must be positive")
-        BigDecimal price   // client tells you what they expect to pay
+        BigDecimal price,
+
+        @NotNull(message = "Cancel url is required")
+        String cancelUrl
 ) {}

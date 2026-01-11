@@ -4,6 +4,7 @@ import com.example.HotelBooking.entity.Place;
 import com.example.HotelBooking.entity.PlacePhoto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Comparator;
@@ -31,8 +32,9 @@ public record PlaceResponse(
         List<String> perks,
 
         List<String> photoUrls
-) {
+        ) {
     public static PlaceResponse from(Place place) {
+
         return new PlaceResponse(
                 place.getId(),
                 place.getTitle(),

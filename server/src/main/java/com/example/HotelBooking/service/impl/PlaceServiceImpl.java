@@ -1,34 +1,30 @@
 package com.example.HotelBooking.service.impl;
 
-import com.example.HotelBooking.dto.ApiResponse;
 import com.example.HotelBooking.dto.CreatePlaceRequest;
 import com.example.HotelBooking.dto.PlaceResponse;
 import com.example.HotelBooking.dto.UpdatePlaceRequest;
-import com.example.HotelBooking.entity.Place;
-import com.example.HotelBooking.entity.PlacePerk;
-import com.example.HotelBooking.entity.PlacePhoto;
-import com.example.HotelBooking.entity.User;
+import com.example.HotelBooking.entity.*;
 import com.example.HotelBooking.exception.ResourceNotFoundException;
 import com.example.HotelBooking.infrastructure.cache.PlaceRedisCache;
+import com.example.HotelBooking.repository.BookingRepository;
 import com.example.HotelBooking.repository.PlacePerkRepository;
 import com.example.HotelBooking.repository.PlacePhotoRepository;
 import com.example.HotelBooking.repository.PlaceRepository;
-import com.example.HotelBooking.service.PlacePhotoService;
 import com.example.HotelBooking.service.PlaceService;
 import com.example.HotelBooking.utils.UpdateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,6 +40,7 @@ public class PlaceServiceImpl implements PlaceService {
     private final PlacePerkRepository placePerkRepository;
 
     private final PlaceRedisCache placeCache;
+    private final BookingRepository bookingRepository;
 
     @Override
     public PlaceResponse createPlace(CreatePlaceRequest createPlaceRequest, User user) {
@@ -90,7 +87,6 @@ public class PlaceServiceImpl implements PlaceService {
 
             return cached;
         }
-        ;
 
         log.info("User places CACHE MISS – loading from DB – userId={}", user.getId());
 
@@ -151,6 +147,11 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
+    public List<LocalDate> getPlaceBlockedDates(UUID id) {
+        return calculateBlockedDates(id);
+    }
+
+    @Override
     public PlaceResponse updatePlace(UpdatePlaceRequest updatePlaceRequest, User user) {
         Place place = placeRepository.findById(updatePlaceRequest.id()).orElseThrow(() -> new ResourceNotFoundException("Place not found with id" + updatePlaceRequest.id()));
 
@@ -198,6 +199,30 @@ public class PlaceServiceImpl implements PlaceService {
         placeCache.evictPlace(id);
         placeCache.evictUserPlaces(user.getId());
         placeCache.evictAllPlaces();
+    }
+
+    private List<LocalDate> calculateBlockedDates(UUID placeId) {
+        LocalDateTime endOfToday = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
+
+        List<Booking> bookings = bookingRepository.findActiveBookingsByPlaceId(placeId, endOfToday);
+
+        ArrayList<LocalDate> blockedDates = new ArrayList<>();
+
+        for (Booking booking : bookings) {
+            LocalDateTime checkIn = booking.getCheckIn();
+            LocalDateTime checkOut = booking.getCheckOut();
+
+            LocalDate checkInDate = checkIn.toLocalDate();
+            LocalDate checkOutDate = checkOut.toLocalDate();
+
+            List<LocalDate> dates = checkInDate.datesUntil(checkOutDate).collect(Collectors.toList());
+
+            blockedDates.addAll(dates);
+        }
+
+        blockedDates.sort(LocalDate::compareTo);
+
+        return blockedDates;
     }
 
     private void syncPhotos(Place place, List<String> photoUrls) {
