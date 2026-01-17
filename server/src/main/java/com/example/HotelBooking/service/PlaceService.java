@@ -23,4 +23,6 @@ public interface PlaceService {
 
     public PlaceResponse updatePlace(UpdatePlaceRequest updatePlaceRequest, User user);
     public void deletePlace(UUID id, User user);
+
+    public List<PlaceResponse> searchPlaces(String pattern);
 }

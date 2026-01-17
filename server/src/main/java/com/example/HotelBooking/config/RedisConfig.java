@@ -1,4 +1,4 @@
-package com.example.HotelBooking.security.config;
+package com.example.HotelBooking.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;

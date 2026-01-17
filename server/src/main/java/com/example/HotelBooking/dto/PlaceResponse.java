@@ -22,7 +22,7 @@ public record PlaceResponse(
         LocalTime checkIn,
         LocalTime checkOut,
 
-        int maxGuests,
+        Integer maxGuests,
         BigDecimal price,
 
         String ownerUsername,

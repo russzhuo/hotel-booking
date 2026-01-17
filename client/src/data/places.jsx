@@ -2,6 +2,7 @@ import { useCallback, useEffect } from "react";
 import { api } from "../services/http-client";
 import { useQuery } from "@tanstack/react-query";
 import { event, EVENTS } from "../event";
+import { useSearchParams } from "react-router-dom";
 
 const fetchUserPlaces = async () => {
   const response = await api.get("/places/user-places");
@@ -13,8 +14,10 @@ const fetchUserPlaces = async () => {
   return response.data.data;
 };
 
-const fetchPlaces = async () => {
-  const response = await api.get("/places");
+const fetchPlaces = async (params = {}) => {
+  const response = await api.get("/places", {
+    params
+  });
 
   if (!response.data?.success) {
     throw new Error(response.data.message || "Failed to fetch places");
@@ -42,10 +45,19 @@ export const updatePlace = async (data) => {
   return await api.put(`/places`, data);
 };
 
+export const searchPlaces = async (data) => {
+  return await api.get(`/places/search`, {
+    params: data
+  });
+}
+
 export const usePlaces = () => {
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get('q') || '';
+
   return useQuery({
-    queryKey: ["places"],
-    queryFn: fetchPlaces,
+    queryKey: ["places", query],
+    queryFn: () => fetchPlaces({ query }),
   });
 };
 
@@ -77,12 +89,12 @@ export const usePlaceDetails = (placeId) => {
   }, [queryResults]);
 
   const update = useCallback(async (data = {}) => {
-    return updatePlace({id: placeId, ...data});
+    return updatePlace({ id: placeId, ...data });
   }, [placeId]);
 
   return {
     ...queryResults,
-    update
+    update,
   }
 };
 

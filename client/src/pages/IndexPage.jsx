@@ -24,7 +24,7 @@ export default function IndexPage() {
     if (!places?.length) {
       return (
         <Typography textAlign="center" py={8} color="text.secondary">
-          No places yet
+          No places found
         </Typography>
       );
     }

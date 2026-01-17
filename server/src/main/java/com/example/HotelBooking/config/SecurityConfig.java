@@ -1,4 +1,4 @@
-package com.example.HotelBooking.security.config;
+package com.example.HotelBooking.config;
 
 import com.example.HotelBooking.dto.ApiResponse;
 import com.example.HotelBooking.exception.GlobalExceptionHandler;
@@ -96,6 +96,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/places").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/places/search").permitAll()
                         .requestMatchers("/api/places/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/resources/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/webhook/**").permitAll()

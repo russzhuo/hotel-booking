@@ -15,14 +15,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-//router.post('/places',postPlace)
-//router.get('/places',getPlaces)
-//router.get('/user-places',getUserPlaces)
-//router.get('/places/:id',getPlacesById)
-//router.put('/places',putPlace)
 
 @RestController
 @RequestMapping("api/places")
@@ -60,13 +57,47 @@ public class PlaceController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PlaceResponse>>> getAllPlaces() {
-        log.info("Fetching all available places");
+    public ResponseEntity<ApiResponse<List<PlaceResponse>>> getPlaces(@RequestParam(required = false) String query) {
+        if (query == null || query.trim().isEmpty()) {
+            List<PlaceResponse> placeResponseList = placeService.getAllPlaces();
+            return ResponseEntity.ok(ApiResponse.success(placeResponseList, "Query is not provided; returning all places"));
+        }
 
-        List<PlaceResponse> placeResponseList = placeService.getAllPlaces();
+        List<PlaceResponse> placeResponseList = placeService.searchPlaces(query.trim());
 
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(placeResponseList, "Places retrieved successfully"));
+        if (placeResponseList.isEmpty()) {
+            return ResponseEntity.ok(ApiResponse.success(Collections.emptyList(), "No places found"));
+        }
+
+        return ResponseEntity.ok(ApiResponse.success(placeResponseList, "Places found for query: " + query));
     }
+
+//    @GetMapping
+//    public ResponseEntity<ApiResponse<List<PlaceResponse>>> getAllPlaces() {
+//        log.info("Fetching all available places");
+//
+//        List<PlaceResponse> placeResponseList = placeService.getAllPlaces();
+//
+//        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(placeResponseList, "Places retrieved successfully"));
+//    }
+
+//    @GetMapping("/search")
+//    public ResponseEntity<ApiResponse<List<PlaceResponse>>> searchPlaces(
+//            @RequestParam(required = false) String query
+//    ) {
+//        if (query == null || query.trim().isEmpty()) {
+//            return ResponseEntity.badRequest()
+//                    .body(ApiResponse.error("Query parameter is required"));
+//        }
+//
+//        List<PlaceResponse> placeResponseList = placeService.searchPlaces(query.trim());
+//
+//        if (placeResponseList.isEmpty()) {
+//            return ResponseEntity.ok(ApiResponse.success(Collections.emptyList(), "No places found"));
+//        }
+//
+//        return ResponseEntity.ok(ApiResponse.success(placeResponseList, "Places found for query: " + query));
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PlaceDetailResponse>> getPlaceById(@PathVariable UUID id, @AuthenticationPrincipal User user) {

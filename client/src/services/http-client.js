@@ -43,7 +43,7 @@ api.interceptors.response.use(
           break;
         case 401:
           if (isBrowser) {
-            const NO_REDIRECT_PATHS = ['/register'];
+            const NO_REDIRECT_PATHS = ['/register', '/'];
 
             const currentPath = location.pathname;
 

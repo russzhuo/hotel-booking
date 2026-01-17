@@ -36,11 +36,13 @@ export default function PlacesFormPage() {
   const { id } = useParams();
 
   const {
-    data: placeDetails,
+    data,
     isLoading,
     error,
     update: updatePlace,
   } = usePlaceDetails(id);
+
+  const placeDetails = data?.basicInfo;
 
   const [title, setTitle] = useState("");
   const [address, setAddress] = useState("");

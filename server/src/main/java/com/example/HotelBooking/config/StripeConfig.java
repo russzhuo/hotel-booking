@@ -1,4 +1,4 @@
-package com.example.HotelBooking.security.config;
+package com.example.HotelBooking.config;
 
 import com.stripe.Stripe;
 import jakarta.annotation.PostConstruct;

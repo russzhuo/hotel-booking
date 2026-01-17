@@ -201,6 +201,12 @@ public class PlaceServiceImpl implements PlaceService {
         placeCache.evictAllPlaces();
     }
 
+    @Override
+    public List<PlaceResponse> searchPlaces(String pattern) {
+        List<Place> placeEntities = placeRepository.searchLike(pattern);
+        return placeEntities.stream().map((place) -> PlaceResponse.from(place)).toList();
+    }
+
     private List<LocalDate> calculateBlockedDates(UUID placeId) {
         LocalDateTime endOfToday = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
 

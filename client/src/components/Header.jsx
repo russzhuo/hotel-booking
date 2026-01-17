@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useLocation } from "react-router-dom";
 import { UserContext } from "../UserContext";
 
 import {
@@ -17,11 +17,14 @@ import {
 import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { Search } from "./Search";
 
 export default function Header() {
   const { user } = useContext(UserContext);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
 
   return (
     <AppBar
@@ -34,7 +37,7 @@ export default function Header() {
         py: { xs: 0.5, sm: 1 },
       }}
     >
-      <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2, sm: 4 } }}>
+      <Toolbar sx={{ justifyContent: "space-between", gap:1, px: { xs: 2, sm: 4 } }}>
         <Button
           component={RouterLink}
           to="/"
@@ -68,13 +71,12 @@ export default function Header() {
                 HomeShare
               </Typography>
             )}
-            {isMobile && (
-              <Typography variant="h6" fontWeight={800} color="primary">
-                HomeShare
-              </Typography>
-            )}
           </Stack>
         </Button>
+
+        {
+          isHomePage && <Search />
+        }
 
         <Tooltip title={user ? "Open account menu" : "Log in or sign up"}>
           <Button

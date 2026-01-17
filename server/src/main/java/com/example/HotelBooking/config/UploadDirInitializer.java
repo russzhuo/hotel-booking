@@ -1,4 +1,4 @@
-package com.example.HotelBooking.security.config;
+package com.example.HotelBooking.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;

@@ -58,6 +58,12 @@ public class Place {
     @Column(nullable = false)
     private BigDecimal price; // in cents
 
+    @Column(name = "city")
+    private String city;
+
+    @Column(name = "country")
+    private String country;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
