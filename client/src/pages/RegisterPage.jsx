@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Container,
-  TextField,
   Typography,
   Paper,
   Avatar,
@@ -13,7 +12,7 @@ import {
   Alert,
   CircularProgress,
 } from "@mui/material";
-import { Password, PersonAdd as PersonAddIcon } from "@mui/icons-material";
+import { PersonAdd as PersonAddIcon } from "@mui/icons-material";
 import { useRegister } from "../data/auth";
 import {
   emailValidator,

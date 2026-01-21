@@ -14,6 +14,7 @@ import Divider from "@mui/material/Divider";
 import { refreshPlaceDetail } from "../event";
 import CheckoutForm from "./CheukoutForm";
 import { useNavigate } from "react-router-dom";
+import { CircularProgress } from "@mui/material";
 
 function calcDateDiffInDays(checkIn, checkOut) {
   const a = new Date(checkIn);
@@ -65,7 +66,7 @@ export default function BookingWidget({ place, blockedDates = [] }) {
     placeCharge = place.price * numbOfNights;
     cleaningFee = placeCharge * 0.12;
     ServiceFee = placeCharge * 0.05;
-    total = placeCharge + cleaningFee + ServiceFee;
+    total = Number((placeCharge + cleaningFee + ServiceFee).toFixed(1));
   }
 
   // Error states

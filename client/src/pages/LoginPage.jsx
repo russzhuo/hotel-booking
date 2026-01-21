@@ -60,22 +60,15 @@ import {
   Box,
   Button,
   Container,
-  TextField,
   Typography,
   Paper,
   Avatar,
   Alert,
   CircularProgress,
-  InputAdornment,
-  IconButton,
   Divider,
 } from "@mui/material";
 import {
   Login as LoginIcon,
-  Email as EmailIcon,
-  Lock as LockIcon,
-  Visibility,
-  VisibilityOff,
 } from "@mui/icons-material";
 import { UserContext } from "../UserContext";
 import { api } from "../services/http-client";
